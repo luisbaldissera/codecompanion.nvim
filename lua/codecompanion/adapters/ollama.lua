@@ -27,7 +27,7 @@ local function get_models(self, opts)
   end
 
   local ok, response = pcall(function()
-    return curl.get(url .. "/v1/models", {
+    return curl.get(url .. "/api/tags", {
       sync = true,
       headers = headers,
       insecure = config.adapters.opts.allow_insecure,
@@ -35,19 +35,19 @@ local function get_models(self, opts)
     })
   end)
   if not ok then
-    log:error("Could not get the Ollama models from " .. url .. "/v1/models.\nError: %s", response)
+    log:error("Could not get the Ollama models from " .. url .. "/api/tags.\nError: %s", response)
     return {}
   end
 
   local ok, json = pcall(vim.json.decode, response.body)
   if not ok then
-    log:error("Could not parse the response from " .. url .. "/v1/models")
+    log:error("Could not parse the response from " .. url .. "/api/tags")
     return {}
   end
 
   local models = {}
-  for _, model in ipairs(json.data) do
-    table.insert(models, model.id)
+  for _, model in ipairs(json.models) do
+    table.insert(models, model.name)
   end
 
   if opts and opts.last then
